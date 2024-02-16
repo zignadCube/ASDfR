@@ -1,0 +1,9 @@
+/cam2image:
+  ros__parameters:
+    socket_ip: 192.168.178.80
+    socket_port: 9999
+    remote_mode: true
+    width: 300
+    height: 200
+    show_camera: false
+    debug: true
