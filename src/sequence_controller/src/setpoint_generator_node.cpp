@@ -6,7 +6,7 @@ class SetpointsGenerator : public rclcpp::Node
 {
 public:
   SetpointsGenerator()
-  : Node("setpoints_generator"), count_(0)
+  : Node("setpoints_generator"), countL_(0), countR_(0), velL_(-2.0), velR_(-2.0)
   {
     auto left_setpoint_desc = rcl_interfaces::msg::ParameterDescriptor{};
     left_setpoint_desc.description = "The setpoint topic for the left motor. Cannot be changed at runtime. Default is /input/left_motor/setpoint_vel.";
@@ -31,7 +31,12 @@ private:
     void left_timer_callback()
     {
         auto message = std_msgs::msg::Float64();
-        message.data = count_++;
+        if (countL_ > 20){
+          countL_ = 0;
+          velL_ = -velL_;
+        }
+        countL_++;
+        message.data = velL_;
         RCLCPP_INFO(this->get_logger(), "Left Publishing: '%f'", message.data);
         left_setpoint_publisher_->publish(message);
     }
@@ -39,7 +44,12 @@ private:
     void right_timer_callback()
     {
         auto message = std_msgs::msg::Float64();
-        message.data = count_++;
+        if (countR_ > 20){
+          countR_ = 0;
+          velR_ = -velR_;
+        }
+        countR_++;
+        message.data = velR_;
         RCLCPP_INFO(this->get_logger(), "Right Publishing: '%f'", message.data);
         right_setpoint_publisher_->publish(message);
     }
@@ -48,7 +58,10 @@ private:
     rclcpp::TimerBase::SharedPtr right_timer_;
     rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr left_setpoint_publisher_;
     rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr right_setpoint_publisher_;
-    size_t count_;
+    int countL_;
+    int countR_;
+    double velL_;
+    double velR_;
 };
 
 int main(int argc, char * argv[])
