@@ -41,28 +41,30 @@ public:
     {
         light_pos = msg;
         RCLCPP_INFO(this->get_logger(), "Light position: x=%f, y=%f", light_pos.x, light_pos.y);
+        
+        speed_ = this->get_parameter("speed").as_double();
+        //RCLCPP_INFO(this->get_logger(), "Speed is: %f", speed_);
+        auto messageL = std_msgs::msg::Float64();
+        auto messageR = std_msgs::msg::Float64();
+
+        double diff = speed_*(light_pos.x - camera_pos.x);
+        if(diff > 3){
+            diff = 3.0;
+        }
+
+        messageL.data = diff;
+        messageR.data = -diff;
+
+        RCLCPP_INFO(this->get_logger(), "L speed is: %f, R speed is: %f", messageL.data, messageR.data);
+
+        left_setpoint_publisher_->publish(messageL);
+        right_setpoint_publisher_->publish(messageR);
     }
 
     void camera_position_callback(const geometry_msgs::msg::PointStamped & msg)
     {
         camera_pos = msg.point;
         RCLCPP_INFO(this->get_logger(), "Camera position: x=%f, y=%f", camera_pos.x, camera_pos.y);
-
-        speed_ = this->get_parameter("speed").as_double();
-        RCLCPP_INFO(this->get_logger(), "Speed is: %f", speed_);
-        auto messageL = std_msgs::msg::Float64();
-        auto messageR = std_msgs::msg::Float64();
-
-        double diff = speed_*(light_pos.x - camera_pos.x);
-        if(diff > 5){
-            diff = 5.0;
-        }
-
-        messageL.data = diff;
-        messageR.data = -diff;
-
-        left_setpoint_publisher_->publish(messageL);
-        right_setpoint_publisher_->publish(messageR);
     }
 
 
