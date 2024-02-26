@@ -18,7 +18,7 @@ public:
     auto image_topic_desc = rcl_interfaces::msg::ParameterDescriptor{};
     image_topic_desc.description = "The topic on which the camera publishes images. Cannot be changed at runtime. Default is 'image'.";
     image_topic_desc.read_only = true;
-    this->declare_parameter("image_topic", "image", image_topic_desc);
+    this->declare_parameter("image_topic", "output/moving_camera", image_topic_desc);
     std::string image_topic = this->get_parameter("image_topic").as_string();
 
     auto thresh_param_desc = rcl_interfaces::msg::ParameterDescriptor{};

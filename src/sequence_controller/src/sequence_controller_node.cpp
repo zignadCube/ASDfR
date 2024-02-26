@@ -21,12 +21,12 @@ public:
         this->declare_parameter("right_setpoint_topic", "/input/right_motor/setpoint_vel", right_setpoint_desc);
         std::string right_setpoint_topic = this->get_parameter("right_setpoint_topic").as_string();
 
-        auto speed_param_desc = rcl_interfaces::msg::ParameterDescriptor{};
+        auto tau_param_desc = rcl_interfaces::msg::ParameterDescriptor{};
         rcl_interfaces::msg::FloatingPointRange range;
         range.set__from_value(0.0).set__to_value(1.0).set__step(0.01);
-        speed_param_desc.set__floating_point_range({range});
-        speed_param_desc.description = "Differential drive control speed";
-        this->declare_parameter("speed", 0.05, speed_param_desc);
+        tau_param_desc.set__floating_point_range({range});
+        tau_param_desc.description = "Closed loop control time constant";
+        this->declare_parameter("tau", 0.05, tau_param_desc);
 
         // Create publishers
         left_setpoint_publisher_ = this->create_publisher<std_msgs::msg::Float64>(left_setpoint_topic, 10);
@@ -42,12 +42,12 @@ public:
         light_pos = msg;
         RCLCPP_INFO(this->get_logger(), "Light position: x=%f, y=%f", light_pos.x, light_pos.y);
         
-        speed_ = this->get_parameter("speed").as_double();
-        //RCLCPP_INFO(this->get_logger(), "Speed is: %f", speed_);
+        tau_ = this->get_parameter("tau").as_double();
+        //RCLCPP_INFO(this->get_logger(), "Tau is: %f", tau_);
         auto messageL = std_msgs::msg::Float64();
         auto messageR = std_msgs::msg::Float64();
 
-        double diff = speed_*(light_pos.x - camera_pos.x);
+        double diff = tau_*(light_pos.x - camera_pos.x);
         if(diff > 3){
             diff = 3.0;
         }
@@ -68,7 +68,7 @@ public:
     }
 
 
-    double speed_;
+    double tau_;
 
     geometry_msgs::msg::Point light_pos;
     geometry_msgs::msg::Point camera_pos;
