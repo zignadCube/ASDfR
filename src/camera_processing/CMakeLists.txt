@@ -22,9 +22,7 @@ ament_target_dependencies(light_position_relbot rclcpp sensor_msgs geometry_msgs
 
 install(TARGETS
   avg_brightness
-  brightness_sub
   light_position
-  light_position_sub
   light_position_relbot
   DESTINATION lib/${PROJECT_NAME}
 )
