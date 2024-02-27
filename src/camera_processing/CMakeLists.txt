@@ -14,6 +14,9 @@ find_package(OpenCV REQUIRED COMPONENTS imgproc highgui)
 add_executable(avg_brightness src/brightness_node.cpp)
 ament_target_dependencies(avg_brightness rclcpp sensor_msgs std_msgs rcl_interfaces OpenCV)
 
+add_executable(image_sub src/image_sub.cpp)
+ament_target_dependencies(image_sub rclcpp sensor_msgs OpenCV)
+
 add_executable(light_position src/light_position.cpp)
 ament_target_dependencies(light_position rclcpp sensor_msgs geometry_msgs rcl_interfaces OpenCV)
 
@@ -22,6 +25,7 @@ ament_target_dependencies(light_position_relbot rclcpp sensor_msgs geometry_msgs
 
 install(TARGETS
   avg_brightness
+  image_sub
   light_position
   light_position_relbot
   DESTINATION lib/${PROJECT_NAME}
