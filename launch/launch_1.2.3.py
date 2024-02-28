@@ -27,7 +27,7 @@ def generate_launch_description():
         package = 'camera_processing',
         name = 'light_position_relbot',
         executable = 'light_position_relbot',
-        parameters = [{"threshold": 250}]
+        parameters = [{"threshold": 250}, {"debug_light_position": True}]
     )
     
     sequence_controller_node = Node(
@@ -37,7 +37,7 @@ def generate_launch_description():
     )
     
     return LaunchDescription([
-        cam2image_node,
+        #cam2image_node,
         RELbot_node,
         light_position_node,
         sequence_controller_node,

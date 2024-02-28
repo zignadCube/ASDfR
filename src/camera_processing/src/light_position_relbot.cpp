@@ -56,6 +56,12 @@ private:
         cv::threshold(gray, gray, threshold_, 255, cv::THRESH_BINARY);
         cv::Moments m = cv::moments(gray, true);
         cv::Point2f center(m.m10/m.m00, m.m01/m.m00);
+
+        if (center.x != center.x || center.y != center.y){
+          if (debug_light_position) RCLCPP_INFO(this->get_logger(), "NaN");
+          center.x = msg.width/2;
+          center.y = msg.hight/2;
+        }
     
         geometry_msgs::msg::Point position;
         position.x = center.x;
@@ -67,6 +73,7 @@ private:
         if (debug_light_position)
         {
             this->debug_light_position(gray, center); // Fixed the function call
+            RCLCPP_INFO(this->get_logger(), "Width image: %d", msg.width);
         }
     }
 

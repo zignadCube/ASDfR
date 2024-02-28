@@ -6,7 +6,7 @@ class SetpointsGenerator : public rclcpp::Node
 {
 public:
   SetpointsGenerator()
-  : Node("setpoints_generator"), countL_(0), countR_(0), velL_(-2.0), velR_(-2.0)
+  : Node("setpoints_generator"), countL_(0), countR_(0), velL_(4.0), velR_(4.0)
   {
     auto left_setpoint_desc = rcl_interfaces::msg::ParameterDescriptor{};
     left_setpoint_desc.description = "The setpoint topic for the left motor. Cannot be changed at runtime. Default is /input/left_motor/setpoint_vel.";

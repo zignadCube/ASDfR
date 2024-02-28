@@ -47,7 +47,7 @@ public:
         auto messageL = std_msgs::msg::Float64();
         auto messageR = std_msgs::msg::Float64();
 
-        double diff = tau_*(light_pos.x - camera_pos.x);
+        double diff = tau_*(light_pos.x - 90);
         if(diff > 3){
             diff = 3.0;
         }
