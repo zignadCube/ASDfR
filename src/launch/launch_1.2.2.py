@@ -27,7 +27,7 @@ def generate_launch_description():
         package = 'camera_processing',
         name = 'light_position',
         executable = 'light_position',
-        parameters = [{"threshold": 250}]
+        parameters = [{"threshold": 250}, {"debug_light_position": True}]
     )
     
     sequence_controller_node = Node(

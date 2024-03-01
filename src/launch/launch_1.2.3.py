@@ -25,15 +25,16 @@ def generate_launch_description():
     
     light_position_node = Node(
         package = 'camera_processing',
-        name = 'light_position_relbot',
-        executable = 'light_position_relbot',
-        parameters = [{"threshold": 250}, {"debug_light_position": False}]
+        name = 'light_position',
+        executable = 'light_position',
+        parameters = [{"threshold": 250}, {"debug_light_position": True}, {"image_topic": "/output/moving_camera"}]
     )
     
     sequence_controller_node = Node(
         package = 'sequence_controller',
-        name = 'sequence_controller',
-        executable = 'sequence_controller'
+        name = 'sequence_controller_moving',
+        executable = 'sequence_controller_moving'#,
+        # parameters=[{"tau": 0.1}]
     )
     
     return LaunchDescription([

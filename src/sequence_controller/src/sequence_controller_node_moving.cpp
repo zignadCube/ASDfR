@@ -47,18 +47,30 @@ public:
         auto messageL = std_msgs::msg::Float64();
         auto messageR = std_msgs::msg::Float64();
 
-        double diff = tau_*(light_pos.x - 90);
+        double diff = tau_*(light_pos.x);
+        RCLCPP_INFO(this->get_logger(), "Diff is: %f", light_pos.x);
         if(diff > 3){
             diff = 3.0;
+        } else if(diff < -3){
+            diff = -3.0;
         }
 
         messageL.data = diff;
         messageR.data = -diff;
 
-        RCLCPP_INFO(this->get_logger(), "L speed is: %f, R speed is: %f", messageL.data, messageR.data);
 
-        left_setpoint_publisher_->publish(messageL);
-        right_setpoint_publisher_->publish(messageR);
+        // Only send messages if that data is not NaN
+        if (messageL.data == messageL.data && messageR.data == messageR.data)
+        {
+            RCLCPP_INFO(this->get_logger(), "L speed is: %f, R speed is: %f", messageL.data, messageR.data);
+            left_setpoint_publisher_->publish(messageL);
+            right_setpoint_publisher_->publish(messageR);
+        }
+        else
+        {
+            RCLCPP_INFO(this->get_logger(), "NaN detected, not publishing");
+        }
+        
     }
 
     void camera_position_callback(const geometry_msgs::msg::PointStamped & msg)

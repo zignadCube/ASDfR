@@ -20,14 +20,10 @@ ament_target_dependencies(image_sub rclcpp sensor_msgs OpenCV)
 add_executable(light_position src/light_position.cpp)
 ament_target_dependencies(light_position rclcpp sensor_msgs geometry_msgs rcl_interfaces OpenCV)
 
-add_executable(light_position_relbot src/light_position_relbot.cpp)
-ament_target_dependencies(light_position_relbot rclcpp sensor_msgs geometry_msgs rcl_interfaces OpenCV)
-
 install(TARGETS
   avg_brightness
   image_sub
   light_position
-  light_position_relbot
   DESTINATION lib/${PROJECT_NAME}
 )
 

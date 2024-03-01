@@ -1,17 +1,3 @@
-// 1.1.4 Simple light position indicator
-// A very simple way of detecting the position of a bright light in an (otherwise no so bright) image
-// is the following:
-// 1. Gray-scale the image.
-// 2. Apply a threshold on the brightness of each pixel.
-// If the threshold is well-chosen (and there are no other bright parts in the image), the
-// result is a black image with a large white dot where you shine the light. You may need to
-// reduce background light.
-// 3. Compute the ‘center of gravity’ (COG) of the white pixels. This COG (in pixel coordinates)
-// gives an indication of the position of the center of the light.
-// Create a node that, given a camera input, outputs the position of a bright light (if there is any)
-// in pixel coordinates. The node should be easy to use, e.g., also when using in a larger project,
-// on a different webcam or with different lighting conditions.
-
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/image.hpp"
 #include "geometry_msgs/msg/point.hpp"
@@ -35,8 +21,8 @@ public:
     rcl_interfaces::msg::IntegerRange range;
     range.set__from_value(0).set__to_value(255).set__step(1);
     thresh_param_desc.set__integer_range({range});
-    thresh_param_desc.description = "Brightness threshold between 0 and 255. Default is 100.";
-    this->declare_parameter("threshold", 100, thresh_param_desc);
+    thresh_param_desc.description = "Brightness threshold between 0 and 255. Default is 250.";
+    this->declare_parameter("threshold", 250, thresh_param_desc);
 
     auto debug_light_position_desc = rcl_interfaces::msg::ParameterDescriptor{};
     debug_light_position_desc.description = "If true, the light position is printed to the console and a debug image is shown. Default is false.";
@@ -55,6 +41,7 @@ private:
         threshold_ = this->get_parameter("threshold").as_int();
     
         cv::Mat image(msg.height, msg.width, CV_8UC3, const_cast<unsigned char*>(msg.data.data()));
+        RCLCPP_INFO(this->get_logger(), "Image received: %dx%d", msg.width, msg.height);
         cv::Mat gray;
         cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
         cv::threshold(gray, gray, threshold_, 255, cv::THRESH_BINARY);
@@ -62,8 +49,8 @@ private:
         cv::Point2f center(m.m10/m.m00, m.m01/m.m00);
     
         geometry_msgs::msg::Point position;
-        position.x = center.x;
-        position.y = center.y;
+        position.x = center.x - msg.width/2;
+        position.y = center.y - msg.height/2;
         position.z = 0;
         light_position_pub_->publish(position);
     
