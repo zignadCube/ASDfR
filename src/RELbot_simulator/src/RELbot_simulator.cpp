@@ -189,6 +189,7 @@ void RELbotSimulator::dynamics_timer_callback()
   robot_pose.pose.position.set__x(dynamics_simulation_.get_x());
   robot_pose.pose.position.set__y(dynamics_simulation_.get_y());
   robot_pose.pose.orientation.set__z(dynamics_simulation_.get_theta());
+  robot_pose_topic->publish(robot_pose);
 
   // Output the actual position
 
