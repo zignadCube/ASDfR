@@ -6,7 +6,7 @@ class SetpointsGenerator : public rclcpp::Node
 {
 public:
   SetpointsGenerator()
-  : Node("setpoints_generator"), countL_(0), countR_(0), velL_(4.0), velR_(4.0)
+  : Node("setpoints_generator"), count_(0), velL_(4.0), velR_(4.0)
   {
     auto left_setpoint_desc = rcl_interfaces::msg::ParameterDescriptor{};
     left_setpoint_desc.description = "The setpoint topic for the left motor. Cannot be changed at runtime. Default is /input/left_motor/setpoint_vel.";
@@ -21,45 +21,33 @@ public:
     std::string right_setpoint_topic = this->get_parameter("right_setpoint_topic").as_string();
 
     left_setpoint_publisher_ = this->create_publisher<std_msgs::msg::Float64>(left_setpoint_topic, 10);
-    left_timer_ = this->create_wall_timer(std::chrono::milliseconds(500), std::bind(&SetpointsGenerator::left_timer_callback, this));
-
     right_setpoint_publisher_ = this->create_publisher<std_msgs::msg::Float64>(right_setpoint_topic, 10);
-    right_timer_ = this->create_wall_timer(std::chrono::milliseconds(500), std::bind(&SetpointsGenerator::right_timer_callback, this));
+    timer_ = this->create_wall_timer(std::chrono::milliseconds(250), std::bind(&SetpointsGenerator::timer_callback, this));
   }
 
 private:
-    void left_timer_callback()
+    void timer_callback()
     {
-        auto message = std_msgs::msg::Float64();
-        if (countL_ > 20){
-          countL_ = 0;
-          velL_ = -velL_;
-        }
-        countL_++;
-        message.data = velL_;
-        RCLCPP_INFO(this->get_logger(), "Left Publishing: '%f'", message.data);
-        left_setpoint_publisher_->publish(message);
-    }
+        auto left_message = std_msgs::msg::Float64();
+        auto right_message = std_msgs::msg::Float64();
 
-    void right_timer_callback()
-    {
-        auto message = std_msgs::msg::Float64();
-        if (countR_ > 20){
-          countR_ = 0;
+        if (count_ > 10){
+          count_ = 0;
+          velL_ = -velL_;
           velR_ = -velR_;
         }
-        countR_++;
-        message.data = velR_;
-        RCLCPP_INFO(this->get_logger(), "Right Publishing: '%f'", message.data);
-        right_setpoint_publisher_->publish(message);
+        count_++;
+        left_message.data = velL_;
+        right_message.data = velR_;
+        RCLCPP_INFO(this->get_logger(), "Left/Right Publishing: '%f'/'%f'", left_message.data, right_message.data);
+        left_setpoint_publisher_->publish(left_message);
+        right_setpoint_publisher_->publish(right_message);
     }
 
-    rclcpp::TimerBase::SharedPtr left_timer_;
-    rclcpp::TimerBase::SharedPtr right_timer_;
+    rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr left_setpoint_publisher_;
     rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr right_setpoint_publisher_;
-    int countL_;
-    int countR_;
+    int count_;
     double velL_;
     double velR_;
 };
