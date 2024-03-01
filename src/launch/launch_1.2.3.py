@@ -37,7 +37,7 @@ def generate_launch_description():
     )
     
     return LaunchDescription([
-        #cam2image_node,
+        cam2image_node,
         RELbot_node,
         light_position_node,
         sequence_controller_node,

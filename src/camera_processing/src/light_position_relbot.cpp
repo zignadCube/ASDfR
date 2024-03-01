@@ -58,9 +58,9 @@ private:
         cv::Point2f center(m.m10/m.m00, m.m01/m.m00);
 
         if (center.x != center.x || center.y != center.y){
-          if (debug_light_position) RCLCPP_INFO(this->get_logger(), "NaN");
+          RCLCPP_INFO(this->get_logger(), "NaN");
           center.x = msg.width/2;
-          center.y = msg.hight/2;
+          center.y = msg.height/2;
         }
     
         geometry_msgs::msg::Point position;
