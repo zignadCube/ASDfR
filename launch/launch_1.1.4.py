@@ -17,28 +17,14 @@ def generate_launch_description():
         parameters = [config]
         )
     
-    RELbot_node = Node(
-        package = 'RELbot_simulator',
-        name = 'RELbot_simulator',
-        executable = 'RELbot_simulator'
-    )
-    
     light_position_node = Node(
         package = 'camera_processing',
-        name = 'light_position_relbot',
-        executable = 'light_position_relbot',
-        parameters = [{"threshold": 250}, {"debug_light_position": False}]
-    )
-    
-    sequence_controller_node = Node(
-        package = 'sequence_controller',
-        name = 'sequence_controller',
-        executable = 'sequence_controller'
+        name = 'light_position',
+        executable = 'light_position',
+        parameters = [{"threshold": 250}, {"debug_light_position": True}]
     )
     
     return LaunchDescription([
-        #cam2image_node,
-        RELbot_node,
+        cam2image_node,
         light_position_node,
-        sequence_controller_node,
     ])
