@@ -32,8 +32,8 @@ def generate_launch_description():
     
     sequence_controller_node = Node(
         package = 'sequence_controller',
-        name = 'sequence_controller',
-        executable = 'sequence_controller'
+        name = 'sequence_controller_steady',
+        executable = 'sequence_controller_steady',
     )
     
     return LaunchDescription([

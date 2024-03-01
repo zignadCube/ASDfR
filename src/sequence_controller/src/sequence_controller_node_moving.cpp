@@ -3,10 +3,10 @@
 #include "std_msgs/msg/float64.hpp"
 #include "geometry_msgs/msg/point_stamped.hpp"
 
-class SequenceController : public rclcpp::Node
+class SequenceControllerMoving : public rclcpp::Node
 {
 public:
-    SequenceController()
+    SequenceControllerMoving()
     : Node("sequence_controller")
     {
         auto left_setpoint_desc = rcl_interfaces::msg::ParameterDescriptor{};
@@ -33,8 +33,8 @@ public:
         right_setpoint_publisher_ = this->create_publisher<std_msgs::msg::Float64>(right_setpoint_topic, 10);
 
         // Create subscriptions
-        light_position_sub_ = this->create_subscription<geometry_msgs::msg::Point>("light_position", 10, std::bind(&SequenceController::light_position_callback, this, std::placeholders::_1));
-        camera_position_sub_ = this->create_subscription<geometry_msgs::msg::PointStamped>("output/camera_position", 10, std::bind(&SequenceController::camera_position_callback, this, std::placeholders::_1));
+        light_position_sub_ = this->create_subscription<geometry_msgs::msg::Point>("light_position", 10, std::bind(&SequenceControllerMoving::light_position_callback, this, std::placeholders::_1));
+        camera_position_sub_ = this->create_subscription<geometry_msgs::msg::PointStamped>("output/camera_position", 10, std::bind(&SequenceControllerMoving::camera_position_callback, this, std::placeholders::_1));
     }
 
     void light_position_callback(const geometry_msgs::msg::Point & msg)
@@ -94,7 +94,7 @@ public:
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<SequenceController>());
+  rclcpp::spin(std::make_shared<SequenceControllerMoving>());
   rclcpp::shutdown();
   return 0;
 }

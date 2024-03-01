@@ -3,11 +3,11 @@
 #include "std_msgs/msg/float64.hpp"
 #include "geometry_msgs/msg/point_stamped.hpp"
 
-class SequenceController : public rclcpp::Node
+class SequenceControllerSteady : public rclcpp::Node
 {
 public:
-    SequenceController()
-    : Node("sequence_controller")
+    SequenceControllerSteady()
+    : Node("sequence_controller_steady")
     {
         auto left_setpoint_desc = rcl_interfaces::msg::ParameterDescriptor{};
         left_setpoint_desc.description = "The setpoint topic for the left motor. Cannot be changed at runtime. Default is /input/left_motor/setpoint_vel.";
@@ -21,6 +21,12 @@ public:
         this->declare_parameter("right_setpoint_topic", "/input/right_motor/setpoint_vel", right_setpoint_desc);
         std::string right_setpoint_topic = this->get_parameter("right_setpoint_topic").as_string();
 
+        auto image_width_desc = rcl_interfaces::msg::ParameterDescriptor{};
+        image_width_desc.description = "The width of the image. Cannot be changed at runtime. Default is 320.";
+        image_width_desc.read_only = true;
+        this->declare_parameter("image_width", 320, image_width_desc);
+        image_width_ = this->get_parameter("image_width").as_int();
+
         auto tau_param_desc = rcl_interfaces::msg::ParameterDescriptor{};
         rcl_interfaces::msg::FloatingPointRange range;
         range.set__from_value(0.0).set__to_value(1.0).set__step(0.01);
@@ -33,8 +39,8 @@ public:
         right_setpoint_publisher_ = this->create_publisher<std_msgs::msg::Float64>(right_setpoint_topic, 10);
 
         // Create subscriptions
-        light_position_sub_ = this->create_subscription<geometry_msgs::msg::Point>("light_position", 10, std::bind(&SequenceController::light_position_callback, this, std::placeholders::_1));
-        camera_position_sub_ = this->create_subscription<geometry_msgs::msg::PointStamped>("output/camera_position", 10, std::bind(&SequenceController::camera_position_callback, this, std::placeholders::_1));
+        light_position_sub_ = this->create_subscription<geometry_msgs::msg::Point>("light_position", 10, std::bind(&SequenceControllerSteady::light_position_callback, this, std::placeholders::_1));
+        camera_position_sub_ = this->create_subscription<geometry_msgs::msg::PointStamped>("output/camera_position", 10, std::bind(&SequenceControllerSteady::camera_position_callback, this, std::placeholders::_1));
     }
 
     void light_position_callback(const geometry_msgs::msg::Point & msg)
@@ -47,8 +53,10 @@ public:
         auto messageL = std_msgs::msg::Float64();
         auto messageR = std_msgs::msg::Float64();
 
-        double diff = tau_*(light_pos.x - camera_pos.x);
-        RCLCPP_INFO(this->get_logger(), "Diff is: %f", light_pos.x);
+        image_width_ = this->get_parameter("image_width").as_int();
+
+        double diff = tau_*(light_pos.x + image_width_/2 - camera_pos.x);
+        RCLCPP_INFO(this->get_logger(), "Diff is: %f", light_pos.x + 160 - camera_pos.x);
 
         if(diff > 3){
             diff = 3.0;
@@ -70,6 +78,8 @@ public:
         }
         else
         {
+            left_setpoint_publisher_->publish(std_msgs::msg::Float64());
+            right_setpoint_publisher_->publish(std_msgs::msg::Float64());
             RCLCPP_INFO(this->get_logger(), "NaN detected, not publishing");
         }
         
@@ -83,6 +93,7 @@ public:
 
 
     double tau_;
+    int image_width_;
 
     geometry_msgs::msg::Point light_pos;
     geometry_msgs::msg::Point camera_pos;
@@ -96,7 +107,7 @@ public:
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<SequenceController>());
+  rclcpp::spin(std::make_shared<SequenceControllerSteady>());
   rclcpp::shutdown();
   return 0;
 }
