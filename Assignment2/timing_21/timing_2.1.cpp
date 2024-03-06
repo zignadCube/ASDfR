@@ -20,21 +20,37 @@ void * measurement_thread(void *arg){
         array[i] = i;
     }
 
-    clock_gettime(CLOCK_MONOTONIC_RAW, &threadStart); //start measurement
-    for(int i = 0; i < num; i++){
-        for(int i = 0; i < 100; i++){
-            array[i] = array[i]*3;
+    long long total = 0;
+    long measurements[10];
+
+    for(int j = 0; j < 10; j++){
+        clock_gettime(CLOCK_MONOTONIC_RAW, &threadStart); //start measurement
+        for(int i = 0; i < num; i++){
+            for(int i = 0; i < 100; i++){
+                array[i] = array[i]*3;
+            }
+            clock_nanosleep(CLOCK_MONOTONIC, 0, &time_, NULL);
         }
-        if(clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &time_, NULL) != 0){
-            printf("Error in clock_nanosleep\n");
-            return arg;
-        }
+        clock_gettime(CLOCK_MONOTONIC_RAW, &threadEnd); //end measurement
+
+        long time_diff = (threadEnd.tv_sec - threadStart.tv_sec) * 1000000000 + (threadEnd.tv_nsec - threadStart.tv_nsec);
+
+        total += time_diff;
+        measurements[j] = time_diff;
+
+        printf("Loop %d took %ld microseconds\n", j, time_diff/1000);
     }
-    clock_gettime(CLOCK_MONOTONIC_RAW, &threadEnd); //end measurement
 
-    long time_diff = (threadEnd.tv_sec - threadStart.tv_sec) * 1000000000 + (threadEnd.tv_nsec - threadStart.tv_nsec);
+    long mean = total/10;
+    long sum = 0;
 
-    printf("Loop took %ld microseconds\n", time_diff/1000);
+    for(int i = 0; i < 10; i++){
+        sum += (measurements[i] - mean)*(measurements[i] - mean);
+    }
+    long variation = sum/9;
+
+    printf("Mean: %ld us, variation: %ld us\n", mean/1000, variation/1000);
+
     return arg;
 }
 
