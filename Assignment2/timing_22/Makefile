@@ -6,10 +6,10 @@
 
 CC = g++
 
-CFLAGS = 
+CFLAGS = -I/usr/evl/include -L/usr/evl/lib -levl
 
-SRC := timing_21.cpp
-OUT := timing_21
+SRC := timing_22.cpp
+OUT := timing_22
 
 all:
 	$(CC) $(SRC) -o $(OUT) $(CFLAGS)

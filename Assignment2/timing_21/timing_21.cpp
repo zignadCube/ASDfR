@@ -23,7 +23,7 @@ void * measurement_thread(void *arg){
     long long total = 0;
     long measurements[10];
 
-    for(int j = 0; j < 10; j++){
+    for(int j = 0; j < 100; j++){
         clock_gettime(CLOCK_MONOTONIC_RAW, &threadStart); //start measurement
         for(int i = 0; i < num; i++){
             for(int i = 0; i < 100; i++){
@@ -38,7 +38,8 @@ void * measurement_thread(void *arg){
         total += time_diff;
         measurements[j] = time_diff;
 
-        printf("Loop %d took %ld microseconds\n", j, time_diff/1000);
+        //printf("Loop %d took %ld microseconds\n", j, time_diff/1000);
+        printf("%ld, ", time_diff/1000);
     }
 
     long mean = total/10;
@@ -56,7 +57,7 @@ void * measurement_thread(void *arg){
 
 int main(int argc, char *argv[]){
     pthread_t measurement_thread_;
-    long num = 10000; //default 10000 cycles on the for loop
+    long num = 1000; //default 1000 cycles on the for loop
     if(argc >= 2){
         num = atoi(argv[1]);
     }
