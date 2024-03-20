@@ -9,45 +9,38 @@
 
 void * measurement_thread(void *arg){
     long num = (long) arg;
-
-    struct timespec time_;
-    time_.tv_nsec = 1000000;
-
-    struct timespec threadStart, threadEnd;
-
-    int array[100];
-    for(int i = 0; i < 100; i++){
-        array[i] = i;
-    }
-
-    //long long total = 0;
-    long measurements[num];
+    struct timespec threadStart, threadEnd, wakeupTime;
+    long long measurements[num];
 
 
     for(int j = 0; j < num; j++){
         clock_gettime(CLOCK_MONOTONIC, &threadStart); //start measurement
+        if (threadStart.tv_nsec + 1000000 >= 1000000000) {
+            wakeupTime.tv_sec = threadStart.tv_sec + 1;
+            wakeupTime.tv_nsec = threadStart.tv_nsec + 1000000 - 1000000000;
+        } else {
+            wakeupTime.tv_sec = threadStart.tv_sec;
+            wakeupTime.tv_nsec = threadStart.tv_nsec + 1000000;
+        }
     
         // Calculation
-        for(int i = 0; i < 100; i++){
-            array[i] = array[i]*3;
+        for(int i = 0; i < 10000; i++){
+            int a = i*i;
         }
-        clock_nanosleep(CLOCK_MONOTONIC, 0, &time_, NULL); // Sleep
 
+        clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &wakeupTime, NULL);
         clock_gettime(CLOCK_MONOTONIC, &threadEnd); //end measurement
 
         long time_diff = (threadEnd.tv_sec - threadStart.tv_sec) * 1000000000 + (threadEnd.tv_nsec - threadStart.tv_nsec);
         measurements[j] = time_diff;
-        // total += time_diff;
-        //printf("Loop %d took %ld microseconds\n", j, time_diff/1000);
-        //printf("%ld, ", time_diff/1000);
     }
 
     // Write measurements to file
     printf("Done measuring\nWriting measurements to file\n");
     FILE *fptr;
-    fptr = fopen("measurements.txt", "w");
+    fptr = fopen("measurements_propper.txt", "w");
     for(int i = 0; i < num; i++){
-        fprintf(fptr, "%ld, ", measurements[i]/1000);
+        fprintf(fptr, "%lli,", measurements[i]);
     }   
     fclose(fptr);
 
