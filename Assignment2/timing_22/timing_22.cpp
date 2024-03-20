@@ -6,8 +6,6 @@
 #include <time.h>
 
 void *measurement_thread(void *arg) {
-    long num = (long) arg;
-
     struct sched_param param;
 	int ret, tfd;
 
@@ -18,48 +16,41 @@ void *measurement_thread(void *arg) {
     tfd = evl_attach_self("measurement-thread:%d", getpid());
 
 
-    struct timespec time_;
-    time_.tv_nsec = 1000000;
+    long num = (long) arg;
+    struct timespec threadStart, threadEnd, wakeupTime;
+    long measurements[num];
 
-    struct timespec threadStart, threadEnd;
-
-    int array[100];
-    for(int i = 0; i < 100; i++){
-        array[i] = i;
-    }
-
-    long long total = 0;
-    long measurements[10];
-
-    for(int j = 0; j < 100; j++){
+    for(int j = 0; j < num; j++){
         clock_gettime(CLOCK_MONOTONIC_RAW, &threadStart); //start measurement
-        for(int i = 0; i < num; i++){
-            for(int i = 0; i < 100; i++){
-                array[i] = array[i]*3;
-            }
-            clock_nanosleep(CLOCK_MONOTONIC, 0, &time_, NULL);
+        if (threadStart.tv_nsec + 1000000 >= 1000000000) {
+            wakeupTime.tv_sec = threadStart.tv_sec + 1;
+            wakeupTime.tv_nsec = threadStart.tv_nsec + 1000000 - 1000000000;
+        } else {
+            wakeupTime.tv_sec = threadStart.tv_sec;
+            wakeupTime.tv_nsec = threadStart.tv_nsec + 1000000;
         }
+        
+        // Calculation
+        for(int i = 0; i < 10000; i++){
+            int a = i*i;
+        }
+        
+        clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &wakeupTime, NULL);
         clock_gettime(CLOCK_MONOTONIC_RAW, &threadEnd); //end measurement
 
         long time_diff = (threadEnd.tv_sec - threadStart.tv_sec) * 1000000000 + (threadEnd.tv_nsec - threadStart.tv_nsec);
-
-        total += time_diff;
         measurements[j] = time_diff;
-
-        //printf("Loop %d took %ld microseconds\n", j, time_diff/1000);
-        printf("%ld, ", time_diff/1000);
     }
 
-    long mean = total/10;
-    long sum = 0;
-
-    for(int i = 0; i < 10; i++){
-        sum += (measurements[i] - mean)*(measurements[i] - mean);
-    }
-    long variation = sum/9;
-
-    printf("Mean: %ld us, variation: %ld us\n", mean/1000, variation/1000);
-
+    // Write measurements to file
+    printf("Done measuring\nWriting measurements to file\n");
+    FILE *fptr;
+    fptr = fopen("measurements_propper.txt", "w");
+    for(int i = 0; i < num; i++){
+        fprintf(fptr, "%lli,", measurements[i]);
+    }   
+    fclose(fptr);
+        
     return arg;
 }
 
