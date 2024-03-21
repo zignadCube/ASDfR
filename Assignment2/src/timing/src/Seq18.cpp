@@ -35,27 +35,25 @@ private:
             RCLCPP_INFO(this->get_logger(), "End of measurement, writing to file...");
             long time_diff;
             FILE *fptr;
-            fptr = fopen("measurements_w_stress.txt", "w");
+            fptr = fopen("measurements_ros2_nodes_wo_stress.txt", "w");
             for(int i = 0; i < NUM_LOOPS-1; i++){
                 time_diff = (measurements[i+1].tv_sec - measurements[i].tv_sec) * 1000000000 + (measurements[i+1].tv_nsec - measurements[i].tv_nsec);
                 fprintf(fptr, "%ld, ", time_diff);
             }
             fclose(fptr);
+            RCLCPP_INFO(this->get_logger(), "End of writing to file");
         }
     }
 
     void loop_msg_callback(const std_msgs::msg::Int32 & msg) 
     {
-        if(msg < NUM_LOOPS){
-            if(msg == check){
-                clock_gettime(CLOCK_MONOTONIC, &measurements[check]);
-                check++;
-            }
+        int received_msg = msg.data;
+        if(received_msg < NUM_LOOPS){
+            clock_gettime(CLOCK_MONOTONIC, &measurements[received_msg]);
         }
     }
 
     int counter = 0;
-    int check = 0;
     struct timespec measurements[NUM_LOOPS];
     bool end = false;
 
