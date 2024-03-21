@@ -3,6 +3,8 @@
 #include "rcl_interfaces/msg/parameter_descriptor.hpp"
 #include <time.h>
 
+#define NUM_LOOPS 10000
+
 
 class Seq : public rclcpp::Node
 {
@@ -22,30 +24,42 @@ public:
 private:
     void timerCallback(){
         std_msgs::msg::Int32 message;
-        message.data = counter%100;
+        message.data = counter;
         counter++;
 
-        clock_gettime(CLOCK_MONOTONIC, &msg_send); //start timer for RTT and jitter
-        seq_msg_pub_->publish(message);
-        clock_gettime(CLOCK_MONOTONIC, &after_msg_send); //end timer for jitter
-        long time_diff = (after_msg_send.tv_sec - msg_send.tv_sec) * 1000000000 + (after_msg_send.tv_nsec - msg_send.tv_nsec);
-        RCLCPP_INFO(this->get_logger(), "Seq jitter = %ld us", time_diff/1000);
+        if(counter < NUM_LOOPS){
+            clock_gettime(CLOCK_MONOTONIC, &msg_send); //start timer for RTT and jitter
+            seq_msg_pub_->publish(message);
+        }else if(end == false){
+            end = true;
+            RCLCPP_INFO(this->get_logger(), "End of measurement, writing to file...");
+            long time_diff;
+            FILE *fptr;
+            fptr = fopen("measurements_w_stress.txt", "w");
+            for(int i = 0; i < NUM_LOOPS-1; i++){
+                time_diff = (measurements[i+1].tv_sec - measurements[i].tv_sec) * 1000000000 + (measurements[i+1].tv_nsec - measurements[i].tv_nsec);
+                fprintf(fptr, "%ld, ", time_diff);
+            }
+            fclose(fptr);
+        }
     }
 
     void loop_msg_callback(const std_msgs::msg::Int32 & msg) 
     {
-        clock_gettime(CLOCK_MONOTONIC, &msg_received); //end timer for RTT
-        long time_diff = (msg_received.tv_sec - msg_send.tv_sec) * 1000000000 + (msg_received.tv_nsec - msg_send.tv_nsec);
-        total += time_diff;
-        count++;
-        RCLCPP_INFO(this->get_logger(), "Message received from Loop %d, RTT = %ld us", msg.data, time_diff/1000);
+        if(msg < NUM_LOOPS){
+            if(msg == check){
+                clock_gettime(CLOCK_MONOTONIC, &measurements[check]);
+                check++;
+            }
+        }
     }
 
     int counter = 0;
+    int check = 0;
+    struct timespec measurements[NUM_LOOPS];
+    bool end = false;
 
-    struct timespec msg_send, msg_received, after_msg_send;
-    long long total = 0;
-    int count = 0;
+    struct timespec msg_send, msg_received;
 
     rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr loop_msg_sub_;
     rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr seq_msg_pub_;

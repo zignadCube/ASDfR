@@ -18,12 +18,8 @@ public:
 private:
     void seq_msg_callback(const std_msgs::msg::Int32 & msg) 
     {
-        RCLCPP_INFO(this->get_logger(), "Message received from Seq %d", msg.data);
-        clock_gettime(CLOCK_MONOTONIC, &msg_send); //start timer for jitter
+        // RCLCPP_INFO(this->get_logger(), "Message received from Seq %d", msg.data);
         loop_msg_pub_->publish(msg);
-        clock_gettime(CLOCK_MONOTONIC, &after_msg_send); //end timer for jitter
-        long time_diff = (after_msg_send.tv_sec - msg_send.tv_sec) * 1000000000 + (after_msg_send.tv_nsec - msg_send.tv_nsec);
-        RCLCPP_INFO(this->get_logger(), "Loop jitter = %ld us", time_diff/1000);
     }
 
     struct timespec msg_send, after_msg_send;
