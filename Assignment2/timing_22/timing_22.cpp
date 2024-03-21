@@ -20,8 +20,11 @@ void *measurement_thread(void *arg) {
     ret = evl_set_schedattr(tfd, &attrs);
 
     long num = (long) arg;
-    struct timespec threadStart, threadEnd, wakeupTime;
-    long measurements[num];
+    struct timespec Timestamp, wakeupTime;
+    long long timestamps[num+1];
+
+    evl_read_clock(EVL_CLOCK_MONOTONIC, &Timestamp);
+    timestamps[0] = Timestamp.tv_nsec + Timestamp.tv_sec * 1000000000;
 
     for(int j = 0; j < num; j++){
         evl_read_clock(EVL_CLOCK_MONOTONIC, &threadStart); //start measurement
@@ -39,10 +42,9 @@ void *measurement_thread(void *arg) {
         }
         
         evl_sleep_until(EVL_CLOCK_MONOTONIC, &wakeupTime);
-        evl_read_clock(EVL_CLOCK_MONOTONIC, &threadEnd); //end measurement
+        evl_read_clock(EVL_CLOCK_MONOTONIC, &Timestamp); //end measurement
 
-        long time_diff = (threadEnd.tv_sec - threadStart.tv_sec) * 1000000000 + (threadEnd.tv_nsec - threadStart.tv_nsec);
-        measurements[j] = time_diff;
+        timestamps[j+1] = Timestamp.tv_nsec + Timestamp.tv_sec * 1000000000;
     }
 
     // Write measurements to file
@@ -50,7 +52,7 @@ void *measurement_thread(void *arg) {
     FILE *fptr;
     fptr = fopen("measurements_w_stress.txt", "w");
     for(int i = 0; i < num; i++){
-        fprintf(fptr, "%ld,", measurements[i]);
+        fprintf(fptr, "%ld,", timestamps[i+1] - timestamps[i]);
     }   
     fclose(fptr);
         

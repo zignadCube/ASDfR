@@ -9,18 +9,18 @@
 
 void * measurement_thread(void *arg){
     long num = (long) arg;
-    struct timespec threadStart, threadEnd, wakeupTime;
-    long long measurements[num];
+    struct timespec Timestamp, wakeupTime;
+    long long timestamps[num+1];
 
-
+    clock_gettime(CLOCK_MONOTONIC, &Timestamp);
+    timestamps[0] = Timestamp.tv_nsec + Timestamp.tv_sec * 1000000000;
     for(int j = 0; j < num; j++){
-        clock_gettime(CLOCK_MONOTONIC, &threadStart); //start measurement
-        if (threadStart.tv_nsec + 1000000 >= 1000000000) {
-            wakeupTime.tv_sec = threadStart.tv_sec + 1;
-            wakeupTime.tv_nsec = threadStart.tv_nsec + 1000000 - 1000000000;
+        if (Timestamp.tv_nsec + 1000000 >= 1000000000) {
+            wakeupTime.tv_sec = Timestamp.tv_sec + 1;
+            wakeupTime.tv_nsec = Timestamp.tv_nsec + 1000000 - 1000000000;
         } else {
-            wakeupTime.tv_sec = threadStart.tv_sec;
-            wakeupTime.tv_nsec = threadStart.tv_nsec + 1000000;
+            wakeupTime.tv_sec = Timestamp.tv_sec;
+            wakeupTime.tv_nsec = Timestamp.tv_nsec + 1000000;
         }
     
         // Calculation
@@ -29,10 +29,8 @@ void * measurement_thread(void *arg){
         }
 
         clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &wakeupTime, NULL);
-        clock_gettime(CLOCK_MONOTONIC, &threadEnd); //end measurement
-
-        long time_diff = (threadEnd.tv_sec - threadStart.tv_sec) * 1000000000 + (threadEnd.tv_nsec - threadStart.tv_nsec);
-        measurements[j] = time_diff;
+        clock_gettime(CLOCK_MONOTONIC, &Timestamp);
+        timestamps[j+1] = Timestamp.tv_nsec + Timestamp.tv_sec * 1000000000;
     }
 
     // Write measurements to file
@@ -40,9 +38,10 @@ void * measurement_thread(void *arg){
     FILE *fptr;
     fptr = fopen("measurements_w_stress.txt", "w");
     for(int i = 0; i < num; i++){
-        fprintf(fptr, "%lli,", measurements[i]);
+        fprintf(fptr, "%ld,", timestamps[i+1] - timestamps[i]);
     }   
     fclose(fptr);
+    printf("Last measurement: %lli\n", timestamps[num]);
 
     return arg;
 }
