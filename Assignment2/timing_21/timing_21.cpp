@@ -38,7 +38,7 @@ void * measurement_thread(void *arg){
     // Write measurements to file
     printf("Done measuring\nWriting measurements to file\n");
     FILE *fptr;
-    fptr = fopen("measurements_propper.txt", "w");
+    fptr = fopen("measurements_w_stress.txt", "w");
     for(int i = 0; i < num; i++){
         fprintf(fptr, "%lli,", measurements[i]);
     }   

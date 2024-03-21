@@ -18,6 +18,6 @@ clean:
 	@echo "Cleaning up"
 	@rm -rvf *.o ${OUT}
 
-clean-mes:
+clean-txt:
 	@echo "Cleaning up measurements"
 	@rm -rvf *.txt

@@ -17,3 +17,7 @@ all:
 clean:
 	@echo "Cleaning up"
 	@rm -rvf *.o ${OUT}
+
+clean-txt:
+	@echo "Cleaning up measurements"
+	@rm -rvf *.txt
