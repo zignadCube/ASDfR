@@ -14,13 +14,15 @@ def generate_launch_description():
     seq_node = Node(
         package = 'timing',
         name = 'seq_node',
-        executable = 'seq_node'
+        executable = 'seq_node',
+        parameters = [{"history": "keep_last"}, {"depth": 10}]
         )
     
     loop_node = Node(
         package = 'timing',
         name = 'loop_node',
-        executable = 'loop_node'
+        executable = 'loop_node',
+        parameters = [{"history": "keep_last"}, {"depth": 10}]
     )
     
     return LaunchDescription([

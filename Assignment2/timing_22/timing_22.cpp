@@ -27,13 +27,13 @@ void *measurement_thread(void *arg) {
     timestamps[0] = Timestamp.tv_nsec + Timestamp.tv_sec * 1000000000;
 
     for(int j = 0; j < num; j++){
-        evl_read_clock(EVL_CLOCK_MONOTONIC, &threadStart); //start measurement
-        if (threadStart.tv_nsec + MILLION >= BILLION) {
-            wakeupTime.tv_sec = threadStart.tv_sec + 1;
-            wakeupTime.tv_nsec = threadStart.tv_nsec + MILLION - BILLION;
+        evl_read_clock(EVL_CLOCK_MONOTONIC, &Timestamp); //start measurement
+        if (Timestamp.tv_nsec + MILLION >= BILLION) {
+            wakeupTime.tv_sec = Timestamp.tv_sec + 1;
+            wakeupTime.tv_nsec = Timestamp.tv_nsec + MILLION - BILLION;
         } else {
-            wakeupTime.tv_sec = threadStart.tv_sec;
-            wakeupTime.tv_nsec = threadStart.tv_nsec + MILLION;
+            wakeupTime.tv_sec = Timestamp.tv_sec;
+            wakeupTime.tv_nsec = Timestamp.tv_nsec + MILLION;
         }
         
         // Calculation
@@ -52,7 +52,7 @@ void *measurement_thread(void *arg) {
     FILE *fptr;
     fptr = fopen("measurements_w_stress.txt", "w");
     for(int i = 0; i < num; i++){
-        fprintf(fptr, "%ld,", timestamps[i+1] - timestamps[i]);
+        fprintf(fptr, "%lld,", timestamps[i+1] - timestamps[i]);
     }   
     fclose(fptr);
         

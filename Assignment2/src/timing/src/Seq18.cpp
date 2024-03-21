@@ -28,7 +28,7 @@ private:
         counter++;
 
         if(counter < NUM_LOOPS){
-            clock_gettime(CLOCK_MONOTONIC, &msg_send); //start timer for RTT and jitter
+            clock_gettime(CLOCK_MONOTONIC, &start_send[counter]); //start timer for RTT
             seq_msg_pub_->publish(message);
         }else if(end == false){
             end = true;
@@ -36,8 +36,8 @@ private:
             long time_diff;
             FILE *fptr;
             fptr = fopen("measurements_ros2_nodes_wo_stress.txt", "w");
-            for(int i = 0; i < NUM_LOOPS-1; i++){
-                time_diff = (measurements[i+1].tv_sec - measurements[i].tv_sec) * 1000000000 + (measurements[i+1].tv_nsec - measurements[i].tv_nsec);
+            for(int i = 0; i < NUM_LOOPS; i++){
+                time_diff = (measurements[i].tv_sec - start_send[i].tv_sec) * 1000000000 + (measurements[i].tv_nsec - start_send[i].tv_nsec);
                 fprintf(fptr, "%ld, ", time_diff);
             }
             fclose(fptr);
@@ -55,9 +55,8 @@ private:
 
     int counter = 0;
     struct timespec measurements[NUM_LOOPS];
+    struct timespec start_send[NUM_LOOPS];
     bool end = false;
-
-    struct timespec msg_send, msg_received;
 
     rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr loop_msg_sub_;
     rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr seq_msg_pub_;

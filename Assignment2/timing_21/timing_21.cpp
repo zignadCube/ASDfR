@@ -38,10 +38,9 @@ void * measurement_thread(void *arg){
     FILE *fptr;
     fptr = fopen("measurements_w_stress.txt", "w");
     for(int i = 0; i < num; i++){
-        fprintf(fptr, "%ld,", timestamps[i+1] - timestamps[i]);
+        fprintf(fptr, "%lld,", timestamps[i+1] - timestamps[i]);
     }   
     fclose(fptr);
-    printf("Last measurement: %lli\n", timestamps[num]);
 
     return arg;
 }
