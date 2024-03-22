@@ -9,6 +9,8 @@
 #define BILLION 1000000000L
 
 void *measurement_thread(void *arg) {
+    long num = (long) arg;
+    
     struct sched_param param;
 	int ret, tfd;
 
@@ -19,7 +21,6 @@ void *measurement_thread(void *arg) {
 	attrs.sched_priority = 99;
     ret = evl_set_schedattr(tfd, &attrs);
 
-    long num = (long) arg;
     struct timespec Timestamp, wakeupTime;
     long long timestamps[num+1];
 
@@ -62,25 +63,16 @@ void *measurement_thread(void *arg) {
 
 int main(int argc, char *const argv[])
 {
+    long num = 10000; // default 10000 cycles on the for loop
 	int ret = evl_init();
 	if (ret) {
 		error(1, -ret, "evl_init() failed");
     }
 
     pthread_t measurement_thread_;
-    long num = 10000; // default 10000 cycles on the for loop
-
-    // Set CPU core for thread
-    pthread_t thread;
-    cpu_set_t cpuset;
-
-    // CPU_ZERO(&cpuset);
-    // CPU_SET(1, &cpuset);
 
     // create thread
     pthread_create(&measurement_thread_, NULL, *measurement_thread, (void *)num);
-    //pthread_setaffinity_np(thread, sizeof(cpu_set_t), &cpuset);
-    // sched_setaffinity(thread, sizeof(cpu_set_t), &cpuset);
     printf("Measurement thread created\n");
 
     // wait for thread
