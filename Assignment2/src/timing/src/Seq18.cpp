@@ -37,7 +37,7 @@ private:
             FILE *fptr;
             fptr = fopen("measurements_ros2_nodes_wo_stress.txt", "w");
             for(int i = 0; i < NUM_LOOPS; i++){
-                time_diff = (measurements[i].tv_sec - start_send[i].tv_sec) * 1000000000 + (measurements[i].tv_nsec - start_send[i].tv_nsec);
+                time_diff = (end_measurement[i].tv_sec - start_send[i].tv_sec) * 1000000000 + (end_measurement[i].tv_nsec - start_send[i].tv_nsec);
                 fprintf(fptr, "%ld, ", time_diff);
             }
             fclose(fptr);
@@ -49,12 +49,12 @@ private:
     {
         int received_msg = msg.data;
         if(received_msg < NUM_LOOPS){
-            clock_gettime(CLOCK_MONOTONIC, &measurements[received_msg]);
+            clock_gettime(CLOCK_MONOTONIC, &end_measurement[received_msg]);
         }
     }
 
     int counter = 0;
-    struct timespec measurements[NUM_LOOPS];
+    struct timespec end_measurement[NUM_LOOPS];
     struct timespec start_send[NUM_LOOPS];
     bool end = false;
 
