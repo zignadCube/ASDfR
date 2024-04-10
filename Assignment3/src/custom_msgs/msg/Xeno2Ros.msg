@@ -1,2 +1,2 @@
-float64 x
-float64 y
+int16 x
+int16 y

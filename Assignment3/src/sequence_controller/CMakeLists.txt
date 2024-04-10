@@ -9,6 +9,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(custom_msgs REQUIRED)
+find_package(rcl_interfaces REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
@@ -26,7 +27,7 @@ if(BUILD_TESTING)
 endif()
 
 add_executable(sequence_controller src/sequence_controller.cpp)
-ament_target_dependencies(sequence_controller rclcpp custom_msgs)
+ament_target_dependencies(sequence_controller rclcpp custom_msgs rcl_interfaces)
 
 install(TARGETS
   sequence_controller
