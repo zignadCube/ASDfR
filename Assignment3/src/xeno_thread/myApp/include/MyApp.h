@@ -9,6 +9,10 @@ public:
     ~MyApp();
     
 private:
+    struct Rosdata{
+        float64 x;
+        float64 y;
+    }
 
 protected:
     int preProc() override;

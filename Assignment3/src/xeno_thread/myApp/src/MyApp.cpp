@@ -13,6 +13,7 @@ MyApp::~MyApp()
 
 int MyApp::preProc()
 {
+    struct Rosdata Rosdata_in;
     return 0;
 }
 
