@@ -125,12 +125,12 @@ void LoopController::Initialize (XXDouble *u, XXDouble *y, XXDouble t)
 
 
 	/* set the parameters */
-	m_P[0] = 644.0;		/* PID_Left\Kp {} */
-	m_P[1] = 0.5;		/* PID_Left\Kd {} */
-	m_P[2] = 3.9;		/* PID_Left\Ki {} */
-	m_P[3] = 644.0;		/* PID_Right\Kp {} */
-	m_P[4] = 0.5;		/* PID_Right\Kd {} */
-	m_P[5] = 3.9;		/* PID_Right\Ki {} */
+	m_P[0] = 1.0;		/* PID_Left\Kp {} */ //644
+	m_P[1] = 0.1;		/* PID_Left\Kd {} */ //0.5
+	m_P[2] = 0.1;		/* PID_Left\Ki {} */ //3.9
+	m_P[3] = 1.0;		/* PID_Right\Kp {} */ //644
+	m_P[4] = 0.1;		/* PID_Right\Kd {} */ //0.5
+	m_P[5] = 0.1;		/* PID_Right\Ki {} */ //3.9
 
 
 	/* set the initial values */

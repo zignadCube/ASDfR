@@ -36,7 +36,7 @@ public:
         encoder_sub_ = this->create_subscription<custom_msgs::msg::Xeno2Ros>("Xeno2Ros", 10, std::bind(&SequenceController::encoder_callback, this, std::placeholders::_1));
 
         // Create timer
-        timer_ = this->create_wall_timer(std::chrono::milliseconds(5000), std::bind(&SequenceController::timer_callback, this));
+        timer_ = this->create_wall_timer(std::chrono::milliseconds(1000), std::bind(&SequenceController::timer_callback, this));
     }
 
     void encoder_callback(const custom_msgs::msg::Xeno2Ros & msg)
@@ -51,9 +51,15 @@ public:
     {
         auto message = custom_msgs::msg::Ros2Xeno();
 
-        message.x = encoder_pos.x + 1000;
-        message.y = encoder_pos.y + 1000;
-        RCLCPP_INFO(this->get_logger(), "Left/Right Publishing: '%d'/'%d'", message.x, message.y);
+        if (message.x == 1.0){
+            message.x = -1.0;
+            message.y = -1.0;
+        }else{
+            message.x = 1.0;
+            message.y = 1.0;
+        }
+
+        RCLCPP_INFO(this->get_logger(), "Left/Right Publishing: '%f'/'%f'", message.x, message.y);
         setpoint_publisher_->publish(message);
     }
 
