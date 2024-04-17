@@ -21,7 +21,7 @@ cv.createTrackbar('Lower Hue', 'frame', 0, 179, update_blue_lower)
 cv.createTrackbar('Upper Hue', 'frame', 0, 179, update_blue_upper)
 
 # Set initial values for blue color range
-lower_blue = np.array([80, 128, 128])
+lower_blue = np.array([80, 50, 50])
 upper_blue = np.array([120, 255, 255])
 
 while True:
