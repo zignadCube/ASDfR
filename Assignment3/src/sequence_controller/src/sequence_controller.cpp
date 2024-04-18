@@ -36,10 +36,10 @@ public:
         // Create subscriptions
         encoder_sub_ = this->create_subscription<custom_msgs::msg::Xeno2Ros>("Xeno2Ros", 10, std::bind(&SequenceController::encoder_callback, this, std::placeholders::_1));
 
-        object_position_sub_ = this->create_subscription<geometry_msgs::msg::Point>("object_position", 10, std::bind(&SequenceController::object_position_callback, this, std::placeholders::_1));
+        //object_position_sub_ = this->create_subscription<geometry_msgs::msg::Point>("object_position", 10, std::bind(&SequenceController::object_position_callback, this, std::placeholders::_1));
 
         // Create timer
-        //timer_ = this->create_wall_timer(std::chrono::milliseconds(1000), std::bind(&SequenceController::timer_callback, this));
+        timer_ = this->create_wall_timer(std::chrono::milliseconds(1000), std::bind(&SequenceController::timer_callback, this));
     }
 
 private:
@@ -63,23 +63,29 @@ private:
         setpoint_publisher_->publish(message);
     }
 
-    /* Don't need timer, sending data only when receiving object position
+    ///* Don't need timer, sending data only when receiving object position
     void timer_callback()
     {
         auto message = custom_msgs::msg::Ros2Xeno();
 
-        if (message.x == 1.0){
-            message.x = -1.0;
-            message.y = -1.0;
-        }else{
+        if (timer_count >= 7){
+            message.x = 0.0;
+            message.y = 0.0;
+        }else if (timer_count >= 5){
+            message.x = 0.0;
+            message.y = 1.0;
+        }else if(timer_count >= 0){
             message.x = 1.0;
             message.y = 1.0;
         }
 
-        RCLCPP_INFO(this->get_logger(), "Left/Right Publishing: '%f'/'%f'", message.x, message.y);
+        timer_count++;
+        RCLCPP_INFO(this->get_logger(), "Time: %d Left/Right Publishing: '%f'/'%f'", timer_count, message.x, message.y);
         setpoint_publisher_->publish(message);
     }
-    */
+    //*/
+
+    int timer_count = 0;
 
     custom_msgs::msg::Xeno2Ros encoder_pos;
     geometry_msgs::msg::Point object_pos;
@@ -89,7 +95,7 @@ private:
     rclcpp::Subscription<custom_msgs::msg::Xeno2Ros>::SharedPtr encoder_sub_;
     rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr object_position_sub_;
     
-    //rclcpp::TimerBase::SharedPtr timer_;
+    rclcpp::TimerBase::SharedPtr timer_;
 };
 
 int main(int argc, char * argv[])

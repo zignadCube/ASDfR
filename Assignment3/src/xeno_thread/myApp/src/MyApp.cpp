@@ -31,8 +31,8 @@ int MyApp::preProc()
     XenoData.y = next_enc1 + wrap_count1*16383;
     XenoData.x = next_enc2 + wrap_count2*16383;
 
-    u[0] = XenoData.x*6.2832/63816.0;
-    u[1] = XenoData.y*6.2832/63816.0;
+    u[0] = ((XenoData.x%63816)*6.2832/63816.0);
+    u[1] = ((XenoData.y%63816)*6.2832/63816.0);
 
     u[2] = RosData.x;//RosData.x*6.2832/63816.0;
     u[3] = RosData.y;//RosData.y*6.2832/63816.0;
@@ -51,17 +51,17 @@ int MyApp::postProc()
     if(y[1] > 100){
         FpgaOutput.pwm1 = -2047;
     }else{
-        FpgaOutput.pwm1 = int(y[1]*20.47);
+        FpgaOutput.pwm1 = -int(y[1]*20.47);
     }
     if(y[0] > 100){
         FpgaOutput.pwm2 = 2047;
     }else{
-        FpgaOutput.pwm2 = -int(y[0]*20.47);
+        FpgaOutput.pwm2 = int(y[0]*20.47);
     }
-    //FpgaOutput.pwm1 = -y[1];//-int(y[1]*2047);
-    //FpgaOutput.pwm2 = y[0];//int(y[0]*2047);
+    
+    // FpgaOutput.pwm1 = -int(RosData.y*500.0);
+    // FpgaOutput.pwm2 = int(RosData.x*500.0);
+    
     evl_printf("SteerLeft: %f, SteerRight: %f\n", y[0], y[1]);
-    // FpgaOutput.pwm1 = 0;
-    // FpgaOutput.pwm2 = 0;
     return 0;
 }

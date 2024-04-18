@@ -30,6 +30,9 @@ endif()
 add_executable(sequence_controller src/sequence_controller.cpp)
 ament_target_dependencies(sequence_controller rclcpp custom_msgs rcl_interfaces geometry_msgs)
 
+add_executable(sequence_controller src/sequence_controller_3.3.cpp)
+ament_target_dependencies(sequence_controller_33 rclcpp custom_msgs rcl_interfaces geometry_msgs)
+
 install(TARGETS
   sequence_controller
   DESTINATION lib/${PROJECT_NAME}

@@ -10,10 +10,10 @@ RosXenoBridge::RosXenoBridge() : Node("RosXenoBridge")
   publisher_ = this->create_publisher<custom_msgs::msg::Xeno2Ros>("Xeno2Ros", 1000);
 
   RCLCPP_INFO(this->get_logger(), "Subscribing to topic 'Ros2Xeno'");
-  subscription_ = this->create_subscription<custom_msgs::msg::Ros2Xeno>("Ros2Xeno", 1, std::bind(&RosXenoBridge::Ros2Xeno_callback, this, _1));
+  subscription_ = this->create_subscription<custom_msgs::msg::Ros2Xeno>("Ros2Xeno", 10, std::bind(&RosXenoBridge::Ros2Xeno_callback, this, _1));
 
   RCLCPP_INFO(this->get_logger(), "Creating a timer");
-  timer_ = this->create_wall_timer(std::chrono::milliseconds(30), std::bind(&RosXenoBridge::timer_callback, this));
+  timer_ = this->create_wall_timer(std::chrono::milliseconds(500), std::bind(&RosXenoBridge::timer_callback, this));
 }
 
 void RosXenoBridge::initialize()
