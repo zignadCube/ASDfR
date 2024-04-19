@@ -1,0 +1,73 @@
+LoopController
+=============================================================
+
+INPUTS & OUTPUTS INDICES
+------------------------
+ 
+*** INPUTS ***
+
+	m_V[12] = u[0];		/* PosLeft */
+	m_V[13] = u[1];		/* PosRight */
+	m_V[14] = u[2];		/* SetVelLeft */
+	m_V[15] = u[3];		/* SetVelRight */
+
+ 
+*** OUTPUTS ***
+
+	y[0] = 	m_V[10];		/* SteerLeft */
+	y[1] = 	m_V[11];		/* SteerRight */
+
+ 
+
+
+
+
+NAMES
+-----
+
+[CONSTANTS]
+	NULL
+[PARAMETERS]
+	"PID_Left\\Kp",
+	"PID_Left\\Kd",
+	"PID_Left\\Ki",
+	"PID_Right\\Kp",
+	"PID_Right\\Kd",
+	"PID_Right\\Ki"
+
+[VARIABLES]
+	"PID_Left\\steering",
+	"",
+	"",
+	"",
+	"PID_Right\\steering",
+	"",
+	"",
+	"",
+	"PlusMinus\\minus1",
+	"PlusMinus1\\minus1",
+	"SteerLeft",
+	"SteerRight",
+	"PosLeft",
+	"PosRight",
+	"SetVelLeft",
+	"SetVelRight",
+	"PID_Left\\error_dot_in",
+	"PID_Right\\error_dot_in"
+
+[STATES]
+	"",
+	"",
+	"PosSPLeft\\output",
+	"PosSPRight\\output"
+
+[RATES]
+	"",
+	"",
+	"PosSPLeft\\input",
+	"PosSPRight\\input"
+
+[MATRICES]
+	NULL
+
+

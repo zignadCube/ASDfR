@@ -25,7 +25,5 @@ int MyApp::postProc()
     FpgaOutput.pwm1 = -int(RosData.x * 2047);
     FpgaOutput.pwm2 = int(RosData.y * 2047);
     evl_printf("Rosdata x: %f, y: %f\n", RosData.x, RosData.y);
-    // FpgaOutput.pwm1 = 0;
-    // FpgaOutput.pwm2 = 0;
     return 0;
 }
