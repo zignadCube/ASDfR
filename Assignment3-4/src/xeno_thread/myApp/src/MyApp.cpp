@@ -30,18 +30,19 @@ int MyApp::preProc()
 
     XenoData.y = next_enc1 + wrap_count1*16383;
     XenoData.x = next_enc2 + wrap_count2*16383;
+    
+    prev_enc1 = next_enc1;
+    prev_enc2 = next_enc2;
 
-    u[0] = ((XenoData.x%63816)*6.2832/63816.0);
-    u[1] = ((XenoData.y%63816)*6.2832/63816.0);
+    u[0] = ((XenoData.x%63816)*6.2832/63816.0); /* PosLeft */
+    u[1] = ((XenoData.y%63816)*6.2832/63816.0); /* PosRight */
 
-    u[2] = RosData.x;//RosData.x*6.2832/63816.0;
-    u[3] = RosData.y;//RosData.y*6.2832/63816.0;
+    u[2] = RosData.x; /* SetVelLeft */
+    u[3] = RosData.y; /* SetVelRight */
 
     evl_printf("PosLeft: %f, PosRight: %f\n", u[0], u[1]);
     //evl_printf("XenoData.x: %d, XenoData.y: %d\n", XenoData.x, XenoData.y);
     evl_printf("SetVelLeft: %f, SetVelRight: %f\n", u[2], u[3]);
-    prev_enc1 = next_enc1;
-    prev_enc2 = next_enc2;
     return 0;
 }
 
